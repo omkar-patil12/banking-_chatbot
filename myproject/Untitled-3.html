@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Chatbot</title>
+    <style>
+        body { font-family: Arial; background-color: #f2f2f2; }
+        #chatbox { width: 400px; height: 500px; border: 1px solid #ccc; padding: 10px; background: #fff; overflow-y: auto; }
+        #userInput { width: 300px; }
+        .user { color: blue; }
+        .bot { color: green; }
+    </style>
+</head>
+<body>
+    <h2>Bank Chatbot</h2>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Type message here">
+    <button onclick="sendMessage()">Send</button>
+
+    <script src="chatbot.js"></script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banking Chatbot</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f39c12, #2980b9);
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chat-container {
+      background: #ffffff;
+      width: 420px;
+      height: 600px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #2980b9;
+      color: white;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    #chatbox {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      background: #f9f9f9;
+    }
+
+    .message {
+      margin: 8px 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 75%;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .user {
+      background: #2980b9;
+      color: white;
+      margin-left: auto;
+      border-bottom-right-radius: 0;
+    }
+
+    .bot {
+      background: #f39c12;
+      color: white;
+      margin-right: auto;
+      border-bottom-left-radius: 0;
+    }
+
+    .chat-input {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    .chat-input input {
+      flex: 1;
+      border: none;
+      padding: 14px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .chat-input button {
+      background: #2980b9;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    .chat-input button:hover {
+      background: #f39c12;
+    }
+
+    /* Typing dots effect */
+    .typing {
+      display: inline-block;
+      margin-left: 5px;
+    }
+    .typing span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      margin: 0 1px;
+      background: white;
+      border-radius: 50%;
+      animation: blink 1.4s infinite both;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0; }
+      40% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">🏦 Banking Chatbot</div>
+    <div id="chatbox"></div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Type your question...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    // Initial bot greeting
+    window.onload = function() {
+      let chatbox = document.getElementById("chatbox");
+      addBotMessage("Hello! I’m your Banking Assistant 🤖. What is your question?");
+    };
+
+    // Typing effect for bot messages
+    function typeMessage(text, element) {
+      let i = 0;
+      function typing() {
+        if (i < text.length) {
+          element.innerHTML += text.charAt(i);
+          i++;
+          setTimeout(typing, 30); // speed of typing (ms)
+        }
+      }
+      typing();
+    }
+
+    function addBotMessage(message) {
+      let chatbox = document.getElementById("chatbox");
+      let botMsg = document.createElement("div");
+      botMsg.className = "message bot";
+      chatbox.appendChild(botMsg);
+
+      typeMessage(message, botMsg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      let input = document.getElementById("userInput").value;
+      if (input.trim() === "") return;
+
+      let chatbox = document.getElementById("chatbox");
+      chatbox.innerHTML += "<div class='message user'><b>You:</b> " + input + "</div>";
+
+      document.getElementById("userInput").value = "";
+
+      // Show typing dots
+      let typingDiv = document.createElement("div");
+      typingDiv.className = "message bot";
+      typingDiv.innerHTML = "<b>Bot:</b> <span class='typing'><span></span><span></span><span></span></span>";
+      chatbox.appendChild(typingDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+
+      let response = await fetch("/get", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input })
+      });
+
+      let data = await response.json();
+
+      // Remove typing dots
+      chatbox.removeChild(typingDiv);
+
+      // Show bot message with typing effect
+      addBotMessage("Bot: " + data.reply);
+    }
+  </script>
+</body>
+</html>
